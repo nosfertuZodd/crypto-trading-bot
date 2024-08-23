@@ -13,7 +13,7 @@ CORS(app)
 api_key = 'R1abV976W7rcTLAAQJpD0NVT9UyWoe6LBCAJj93750Y26Kso1j3lEB6n2rVDuxyo'
 api_secret = 'FU00rdJZd0wpxLWbca4AFAVlYmMbkon9Nzddpy2DNe2kkimSazAXvArUnqYyHOuI'
 taapi_api = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjA4NzExNGM0MjI0NmNlM2IwY2U1ZWUzIiwiaWF0IjoxNzIxNDE2ODU3LCJleHAiOjMzMjI1ODgwODU3fQ.i3Mon47Geg_zIZV2sMl8JlFvFJSQruMua6oyLAp7Ebk'
-client = Client(api_key, api_secret)
+client = Client(api_key, api_secret, testnet=True)
 
 @app.route('/symbols', methods=['GET'])
 def get_symbols():
@@ -98,6 +98,39 @@ def get_indicators():
         except Exception as e:
             return jsonify({'error': str(e)}), 500
     return jsonify({'data': responses}) 
-        
+
+@app.route('/buy', methods=['POST'])
+def buy_order():
+    symbol = request.json.get('symbol', 'BTCUSDT')
+    quantity = request.json.get('quantity', 0.001)
+
+    try:
+        order = client.create_order(
+            symbol=symbol,
+            side=Client.SIDE_BUY,
+            type=Client.ORDER_TYPE_MARKET,
+            quantity=quantity
+        )
+        return jsonify(order)
+    except BinanceAPIException as e:
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/sell', methods=['POST'])
+def sell_order():
+    symbol = request.json.get('symbol', 'BTCUSDT')
+    quantity = request.json.get('quantity', 0.001)
+
+    try:
+        order = client.create_order(
+            symbol=symbol,
+            side=Client.SIDE_SELL,
+            type = Client.ORDER_TYPE_MARKET,
+            quantity=quantity
+        )
+        return jsonify(order)
+    except BinanceAPIException as e:
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     app.run(debug=True)
