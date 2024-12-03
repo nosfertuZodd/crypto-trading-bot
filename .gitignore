@@ -58,6 +58,7 @@ coverage.xml
 
 # Flask instance folder
 instance/
+/Indicators
 
 # Flask log and database files
 *.log

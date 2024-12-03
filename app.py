@@ -4,6 +4,8 @@ from requests.exceptions import Timeout
 from flask_cors import CORS
 from binance.exceptions import BinanceAPIException
 import requests
+import pandas as pd
+import datetime, time
 import json
 
 # Initiaizaing a Flask app
@@ -24,24 +26,64 @@ def get_symbols():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/candlestick_data', methods=['GET'])
+@app.route('/candlestick_data_since2023', methods=['GET'])
 def get_candlestick_data():
+    untilThisDate = datetime.datetime(2023, 2, 1)
+    
+    # Start from January 1st, 2023
+    sinceThisDate = datetime.datetime(2023, 1, 1)
+    
+    # Query parameters (symbol, interval)
     symbol = request.args.get('symbol', default='BTCUSDT', type=str)
-    interval = request.args.get('interval', default=Client.KLINE_INTERVAL_1DAY, type=str)
-    limit = request.args.get('limit', default=500, type=int)
+    interval = request.args.get('interval', default=Client.KLINE_INTERVAL_5MINUTE, type=str)
+    
+    all_data = []  # List to hold all the fetched data
+    
     try:
-        candlesticks = client.get_klines(symbol=symbol, interval=interval, limit=limit)
-        data = [{
-            "time": c[0],
-            "open": c[1],
-            "high": c[2],
-            "low": c[3],
-            "close": c[4],
-            "volume": c[5]
-        } for c in candlesticks]
-        return jsonify(data)
+        print(sinceThisDate)
+        # Loop through and fetch all data in batches of 1000 (Binance API limit)
+        while sinceThisDate < untilThisDate:
+            print(f"Fetching data starting from: {sinceThisDate}")  # Log the starting point
+            
+            # Fetch historical candlestick data
+            candlesticks = client.get_historical_klines(symbol=symbol, 
+                                                        interval=interval, 
+                                                        start_str=str(sinceThisDate), 
+                                                        end_str=str(untilThisDate), 
+                                                        limit=5000)
+            
+            if not candlesticks:
+                print("No more data available")
+                break  # Stop the loop if no more data is returned
+            
+            # Append the fetched data to the all_data list
+            all_data.extend(candlesticks)
+            print(f"Fetched {len(candlesticks)} records")  # Log number of records fetched
+            
+            # Update the sinceThisDate to the time of the last returned candlestick
+            last_candle_time = candlesticks[-1][0]  # Get the time of the last returned candlestick
+            sinceThisDate = datetime.datetime.fromtimestamp(last_candle_time / 1000)  # Convert to datetime
+            print(f"New sinceThisDate: {sinceThisDate}")
+        
+        # Convert the data into a DataFrame
+        df = pd.DataFrame(all_data, columns=['dateTime', 'open', 'high', 'low', 'close', 'volume', 'closeTime', 'quoteAssetVolume', 'numberOfTrades', 'takerBuyBaseVol', 'takerBuyQuoteVol', 'ignore'])
+        
+        # Convert timestamp to readable datetime format
+        df['dateTime'] = pd.to_datetime(df['dateTime'], unit='ms').dt.strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Set dateTime as index
+        df.set_index('dateTime', inplace=True)
+
+        # Drop unnecessary columns
+        df.drop(['closeTime', 'quoteAssetVolume', 'numberOfTrades', 'takerBuyBaseVol', 'takerBuyQuoteVol', 'ignore'], axis=1, inplace=True)
+        
+        # Save the DataFrame as CSV
+        df.to_csv('BTC-USDT-Jan2023-Onwards.csv')
+        
+        return jsonify({'message': 'Candlestick data has been saved successfully!'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
     
 indicators = [
                        [ {'indicator': 'rsi', 'period': 14},
@@ -97,7 +139,8 @@ def get_indicators():
                 return jsonify({'error': 'Error from taapi.io', 'status_code': response.status_code}), 500    
         except Exception as e:
             return jsonify({'error': str(e)}), 500
-    return jsonify({'data': responses}) 
+    return jsonify({'data': responses})
+ 
 
 @app.route('/buy', methods=['POST'])
 def buy_order():
@@ -131,6 +174,77 @@ def sell_order():
     except BinanceAPIException as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/compare_predictions', methods=['GET'])
+def compare_predictions():
+    symbol = 'BTCUSDT'
+    interval = Client.KLINE_INTERVAL_15MINUTE
+    limit = 15  # Fetch the last 15 minutes of candlestick data
+    
+    try:
+        # Fetch actual close prices from Binance
+        candlesticks = client.get_klines(symbol=symbol, interval=interval, limit=limit)
+        actual_close_prices = [float(c[4]) for c in candlesticks]
+        
+        # Get predicted close prices
+        predicted_close_prices = get_prediction(symbol, interval)
+        
+        # Calculate error metrics
+        mae = np.mean(np.abs(np.array(actual_close_prices) - np.array(predicted_close_prices)))
+        mse = np.mean((np.array(actual_close_prices) - np.array(predicted_close_prices)) ** 2)
+        rmse = np.sqrt(mse)
+        mape = np.mean(np.abs((np.array(actual_close_prices) - np.array(predicted_close_prices)) / np.array(actual_close_prices))) * 100
+        
+        # Return comparison results
+        comparison = {
+            'actual_close_prices': actual_close_prices,
+            'predicted_close_prices': predicted_close_prices,
+            'mae': mae,
+            'mse': mse,
+            'rmse': rmse,
+            'mape': mape
+        }
+        return jsonify(comparison)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+import numpy as np
+import pandas as pd
+from binance.client import Client
+from datetime import datetime, timedelta
+
+# Define the function to get predictions
+
+def compare_predictions():
+    symbol = 'BTCUSDT'
+    interval = Client.KLINE_INTERVAL_15MINUTE
+    limit = 15  # Fetch the last 15 minutes of candlestick data
+    
+    try:
+        # Fetch actual close prices from Binance
+        candlesticks = client.get_klines(symbol=symbol, interval=interval, limit=limit)
+        actual_close_prices = [float(c[4]) for c in candlesticks]
+        
+        # Get predicted close prices
+        predicted_close_prices = get_prediction(symbol, interval)
+        
+        # Calculate error metrics
+        mae = np.mean(np.abs(np.array(actual_close_prices) - np.array(predicted_close_prices)))
+        mse = np.mean((np.array(actual_close_prices) - np.array(predicted_close_prices)) ** 2)
+        rmse = np.sqrt(mse)
+        mape = np.mean(np.abs((np.array(actual_close_prices) - np.array(predicted_close_prices)) / np.array(actual_close_prices))) * 100
+        
+        # Return comparison results
+        comparison = {
+            'actual_close_prices': actual_close_prices,
+            'predicted_close_prices': predicted_close_prices,
+            'mae': mae,
+            'mse': mse,
+            'rmse': rmse,
+            'mape': mape
+        }
+        return jsonify(comparison)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
