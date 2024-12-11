@@ -34,9 +34,9 @@ symbols = [
 
 
 intervals = {
-    '1M': Client.KLINE_INTERVAL_1MINUTE,
-    '5M': Client.KLINE_INTERVAL_5MINUTE,
-    '30M': Client.KLINE_INTERVAL_30MINUTE,
+    '1m': Client.KLINE_INTERVAL_1MINUTE,
+    '5m': Client.KLINE_INTERVAL_5MINUTE,
+    '30m': Client.KLINE_INTERVAL_30MINUTE,
     '1H': Client.KLINE_INTERVAL_1HOUR,
     '2H': Client.KLINE_INTERVAL_2HOUR,
     '6H': Client.KLINE_INTERVAL_6HOUR,
