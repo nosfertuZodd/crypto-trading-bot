@@ -1,23 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+
 
 function App() {
+  const [symbols, setSymbols] = useState([]);
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:5000/symbols')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => setSymbols(data.symbols))
+      .catch(error => console.error('Fetch error:', error));
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Symbols</h1>
+      <ul>
+        {symbols.map((symbol, index) => (
+          <li key={index}>{symbol}</li>
+        ))}
+      </ul>
     </div>
   );
 }
