@@ -4,15 +4,18 @@ from flask import Flask, jsonify, request
 from binance.client import Client
 from binance.exceptions import BinanceAPIException
 from flask_cors import CORS
+from flasgger import Swagger
 import requests
 import pandas as pd
 import datetime
 import time
 import numpy as np
 
+
 # Initialize Flask app and CORS
 app = Flask(__name__)
 CORS(app)
+swagger = Swagger(app, template_file='swagger.yaml')
 
 # Load API keys from environment variables for security
 API_KEY = 'R1abV976W7rcTLAAQJpD0NVT9UyWoe6LBCAJj93750Y26Kso1j3lEB6n2rVDuxyo'
@@ -145,7 +148,7 @@ def get_custom_indicators():
     # Get the selected indicators from the user's request
     user_indicators = request.json.get('indicators', [])
     symbol = request.json.get('symbol', 'BTC/USDT')
-    interval = request.json.get('interval', '1h')
+    interval = request.json.get('interval', '1m')
     
     if not user_indicators:
         return jsonify({'error': 'Please provide at least one indicator.'}), 400
@@ -240,13 +243,15 @@ def get_indicators():
 # Endpoint to place a buy order
 @app.route('/buy', methods=['POST'])
 def buy_order():
-    symbol = request.json.get('symbol', 'BTCUSDT')
-    quantity = request.json.get('quantity', 0.001)
-    
-    order = place_order(symbol, quantity, Client.SIDE_BUY)
-    if order:
-        return jsonify(order)
-    return jsonify({'error': 'Failed to place buy order'}), 500
+    try:
+        symbol = request.json.get('symbol', 'BTCUSDT')
+        quantity = request.json.get('quantity', 0.001)
+        order = place_order(symbol, quantity, Client.SIDE_BUY)
+        if order:
+            return jsonify(order), 200
+        return jsonify({'error': 'Failed to place buy order'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Endpoint to place a sell order
 @app.route('/sell', methods=['POST'])
@@ -258,6 +263,7 @@ def sell_order():
     if order:
         return jsonify(order)
     return jsonify({'error': 'Failed to place sell order'}), 500
+
 
 # Endpoint to compare predictions and actual data
 @app.route('/compare_predictions', methods=['POST'])
