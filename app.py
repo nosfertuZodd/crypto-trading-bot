@@ -9,15 +9,26 @@ import pandas as pd
 import datetime
 import time
 import numpy as np
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Initialize Flask app and CORS
 app = Flask(__name__)
 CORS(app)
 
+
 # Load API keys from environment variables for security
-API_KEY = 'R1abV976W7rcTLAAQJpD0NVT9UyWoe6LBCAJj93750Y26Kso1j3lEB6n2rVDuxyo'
-API_SECRET = 'FU00rdJZd0wpxLWbca4AFAVlYmMbkon9Nzddpy2DNe2kkimSazAXvArUnqYyHOuI'
-TAAPI_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjc1MDZkYzI4YTIzODE2NDA3NTVhYjA5IiwiaWF0IjoxNzMzMzI0NDEzLCJleHAiOjMzMjM3Nzg4NDEzfQ.6ZiwhhdexNyeCRvFur0xT1RM1fxPNtQj-46KuiiAtug'
+API_KEY = os.getenv('API_KEY')
+API_SECRET = os.getenv('API_SECRET')
+TAAPI_API_KEY = os.getenv('TAAPI_API_KEY')
+
+
+# Load API keys from environment variables for security
+# API_KEY = 'R1abV976W7rcTLAAQJpD0NVT9UyWoe6LBCAJj93750Y26Kso1j3lEB6n2rVDuxyo'
+# API_SECRET = 'FU00rdJZd0wpxLWbca4AFAVlYmMbkon9Nzddpy2DNe2kkimSazAXvArUnqYyHOuI'
+# TAAPI_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjc1MDZkYzI4YTIzODE2NDA3NTVhYjA5IiwiaWF0IjoxNzMzMzI0NDEzLCJleHAiOjMzMjM3Nzg4NDEzfQ.6ZiwhhdexNyeCRvFur0xT1RM1fxPNtQj-46KuiiAtug'
 
 # Set up logging for better visibility
 logging.basicConfig(level=logging.INFO)
@@ -61,7 +72,7 @@ indicators = [
 def get_indicator_data(symbol, interval, indicator):
     url = 'https://api.taapi.io/rsi?secret=API_KEY&exchange=binance&symbol=BTC/USDT&interval=1h'
     payload = {
-        'secret': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjc1MDZkYzI4YTIzODE2NDA3NTVhYjA5IiwiaWF0IjoxNzMzMzI0NDEzLCJleHAiOjMzMjM3Nzg4NDEzfQ.6ZiwhhdexNyeCRvFur0xT1RM1fxPNtQj',
+        'secret': TAAPI_API_KEY,
         'construct': [
             {
                 'exchange': 'binance',
@@ -152,7 +163,7 @@ def get_custom_indicators():
 
     # Prepare the payload for the TAAPI.io API request
     payload = {
-        'secret': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjc1MDZkYzI4YTIzODE2NDA3NTVhYjA5IiwiaWF0IjoxNzMzMzI0NDEzLCJleHAiOjMzMjM3Nzg4NDEzfQ.6ZiwhhdexNyeCRvFur0xT1RM1fxPNtQj-46KuiiAtug',
+        'secret': TAAPI_API_KEY,
         'construct': [
             {
                 'exchange': 'binance',
