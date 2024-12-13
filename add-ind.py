@@ -7,11 +7,12 @@ import ta.volatility
 import ta.volume
 
 
-filenames = [filename for filename in os.listdir("C:/Users/ahmed/VSCode/flask_server/") if filename.endswith('indicators')]
-print(filename.split('-', 1)[0] for filename in filenames)
+filenames = [filename for filename in os.listdir("C:/Users/ahmed/VSCode/flask_server/Indicators") if filename.endswith('indicators')]
+print([filename.split('-', 1)[0] for filename in filenames])
+
 # print(len(filenames))
 
-new_path = ""
+new_path = "C:/Users/ahmed/VSCode/flask_server/new_path"
 
 for file in filenames:
     with open(file=file, mode='r') as infile:
