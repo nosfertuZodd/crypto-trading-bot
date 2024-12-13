@@ -108,7 +108,7 @@ def make_prediction(indicators):
         return 'Strong Buy'
     elif strong_sell_count >= 2:
         return 'Strong Sell'
-    elif buy_count >= 3:
+    elif buy_count >= 4:
         return 'Buy'
     elif sell_count >= 3:
         return 'Sell'
@@ -228,7 +228,6 @@ def get_indicators():
     interval = request.json.get('interval', '1h')
     responses = []
 
-    # Fetch indicators for the selected symbol and interval
     for indicator_group in indicators:
         for indicator in indicator_group:
             indicator_data = get_indicator_data(symbol, interval, indicator)
@@ -279,7 +278,7 @@ def compare_predictions():
     # You can implement prediction logic here. For now, we simulate predicted data:
     predicted_close_prices = [price * 1.01 for price in actual_close_prices]  # Dummy prediction (1% increase)
 
-    # Calculate error metrics again
+    # Calculate error metrics 12345
     mae = np.mean(np.abs(np.array(actual_close_prices) - np.array(predicted_close_prices)))
     mse = np.mean((np.array(actual_close_prices) - np.array(predicted_close_prices)) ** 2)
     
