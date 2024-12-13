@@ -279,10 +279,10 @@ def compare_predictions():
     # You can implement prediction logic here. For now, we simulate predicted data:
     predicted_close_prices = [price * 1.01 for price in actual_close_prices]  # Dummy prediction (1% increase)
 
-    # Calculate error metrics
+    # Calculate error metrics again
     mae = np.mean(np.abs(np.array(actual_close_prices) - np.array(predicted_close_prices)))
     mse = np.mean((np.array(actual_close_prices) - np.array(predicted_close_prices)) ** 2)
-
+    
     return jsonify({
         'mae': mae,
         'mse': mse,
