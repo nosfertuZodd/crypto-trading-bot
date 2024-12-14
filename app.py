@@ -238,7 +238,7 @@ def get_candlestick_data_chart():
 
     # Get the current time in UTC
     end_date = datetime.datetime.utcnow()  # Current UTC time
-    start_date = end_date - datetime.timedelta(hours=10)  # Start date is 5 minutes ago from now
+    start_date = end_date - datetime.timedelta(hours=10)  # Start date is 10 hours ego from now
 
     # Format the dates in the required string format for the Binance API
     start_date_str = start_date.strftime('%Y-%m-%d %H:%M:%S')

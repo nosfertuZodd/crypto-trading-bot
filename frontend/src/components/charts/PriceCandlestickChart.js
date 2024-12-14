@@ -11,7 +11,7 @@ const PriceCandlestickChart = ({ symbol, interval, startDate, endDate }) => {
         const fetchSymbol = symbol || 'BTCUSDT';  // Default symbol
         const fetchInterval = interval || '5m';  // Default interval
         const fetchStartDate = startDate || '2023-01-01';  // Default start date
-        const fetchEndDate = endDate || '2023-02-01';  // Default end date
+        const fetchEndDate = endDate || 'currentDate';  // Default end date
 
         // Dynamically fetch candlestick data based on provided props
         fetch(`http://127.0.0.1:5000/candlestick_data?symbol=${fetchSymbol}&interval=${fetchInterval}&start_date=${fetchStartDate}&end_date=${fetchEndDate}`)
