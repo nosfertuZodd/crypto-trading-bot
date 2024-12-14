@@ -1,179 +1,74 @@
-// Import necessary libraries
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import dayjs from 'dayjs';
 
-const PriceCandlestickChart = () => {
-    const [state, setState] = React.useState({
-        series: [{
-            name: 'candle',
-            data: [
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
-                { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
-                { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
-                { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
-                { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
-                { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
-                { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
-                // Add more data as needed...
-                // Add more data as needed...
+const PriceCandlestickChart = ({ symbol, interval, startDate, endDate }) => {
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-                // Add more data as needed...
-            ]
-        }],
-        options: {
-            chart: {
-                height: 350,
-                type: 'candlestick',
-            },
-            title: {
-                text: 'CandleStick Chart - Category X-axis',
-                align: 'left'
-            },
-            annotations: {
-                xaxis: [
-                    {
-                        x: 'Oct 06 14:00',
-                        borderColor: '#00E396',
-                        label: {
-                            borderColor: '#00E396',
-                            style: {
-                                fontSize: '12px',
-                                color: '#fff',
-                                background: '#00E396'
-                            },
-                            orientation: 'horizontal',
-                            offsetY: 7,
-                            text: 'Annotation Test'
-                        }
-                    }
-                ]
-            },
+    useEffect(() => {
+        // Make sure to handle empty values in props
+        const fetchSymbol = symbol || 'BTCUSDT';  // Default symbol
+        const fetchInterval = interval || '5m';  // Default interval
+        const fetchStartDate = startDate || '2023-01-01';  // Default start date
+        const fetchEndDate = endDate || '2023-02-01';  // Default end date
+
+        // Dynamically fetch candlestick data based on provided props
+        fetch(`http://127.0.0.1:5000/candlestick_data?symbol=${fetchSymbol}&interval=${fetchInterval}&start_date=${fetchStartDate}&end_date=${fetchEndDate}`)
+            .then(response => response.json())
+            .then(result => {
+                console.log("Fetched data:", result); // Log the data to check its structure
+                if (Array.isArray(result) && result.length > 0) {
+                    setData(result);  // Set the fetched data to the state
+                } else {
+                    console.error("No valid data returned");
+                }
+                setLoading(false);
+            })
+            .catch(error => {
+                console.error("Error fetching candlestick data:", error);
+                setLoading(false);
+            });
+    }, [symbol, interval, startDate, endDate]);  // Trigger effect when any of these props change
+
+    // Format the data for the ApexCharts candlestick chart
+    const series = [{
+        name: 'candlestick',
+        data: data.map(item => ({
+            x: dayjs(item.dateTime).isValid() ? dayjs(item.dateTime).toDate() : new Date(),  // Parse the date properly
+            y: [item.open, item.high, item.low, item.close],  // [open, high, low, close] for the candlestick
+        }))
+    }];
+
+    // Chart options configuration
+    const options = {
+        chart: {
+            height: 350,
+            type: 'candlestick',  // Specify the type of chart (candlestick)
+        },
+        title: {
+            text: `Candlestick Chart for ${symbol}`,
+            align: 'left',
+        },
+        xaxis: {
+            type: 'datetime',  // Ensure the x-axis is treated as datetime
+            labels: {
+                formatter: (val) => dayjs(val).format('MMM DD, HH:mm'),  // Formatting x-axis labels
+            }
+        },
+        yaxis: {
             tooltip: {
-                enabled: true,
-            },
-            xaxis: {
-                type: 'category',
-                labels: {
-                    formatter: function(val) {
-                        return dayjs(val).format('MMM DD HH:mm');
-                    }
-                }
-            },
-            yaxis: {
-                tooltip: {
-                    enabled: true
-                }
+                enabled: true,  // Tooltip for y-axis to show values
             }
         }
-    });
+    };
 
     return (
         <div>
-            <div id="chart">
-                <ReactApexChart options={state.options} series={state.series} type="candlestick" height={350} />
-            </div>
-            <div id="html-dist"></div>
+            <h2>{loading ? 'Loading data...' : `Candlestick Chart for ${symbol}`}</h2>
+            <ReactApexChart options={options} series={series} type="candlestick" height={350} />
         </div>
     );
-}
+};
 
 export default PriceCandlestickChart;
