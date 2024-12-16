@@ -1,13 +1,22 @@
 from binance.client import Client
 import pandas as pd
 import datetime
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from.env file
+load_dotenv()
 
 # Binance API credentials
-api_key = 'R1abV976W7rcTLAAQJpD0NVT9UyWoe6LBCAJj93750Y26Kso1j3lEB6n2rVDuxyo'
-api_secret = 'FU00rdJZd0wpxLWbca4AFAVlYmMbkon9Nzddpy2DNe2kkimSazAXvArUnqYyHOuI'
+API_KEY = os.getenv('API_KEY')
+API_SECRET = os.getenv('API_SECRET')
+
+# Binance API credentials
+# api_key = 'R1abV976W7rcTLAAQJpD0NVT9UyWoe6LBCAJj93750Y26Kso1j3lEB6n2rVDuxyo'
+# api_secret = 'FU00rdJZd0wpxLWbca4AFAVlYmMbkon9Nzddpy2DNe2kkimSazAXvArUnqYyHOuI'
 
 
-client = Client(api_key, api_secret)
+client = Client(API_KEY, API_SECRET)
 
 # Define the symbol for BTC/USDT pair
 symbols = [
@@ -25,9 +34,9 @@ symbols = [
 
 
 intervals = {
-    '1M': Client.KLINE_INTERVAL_1MINUTE,
-    '5M': Client.KLINE_INTERVAL_5MINUTE,
-    '30M': Client.KLINE_INTERVAL_30MINUTE,
+    '1m': Client.KLINE_INTERVAL_1MINUTE,
+    '5m': Client.KLINE_INTERVAL_5MINUTE,
+    '30m': Client.KLINE_INTERVAL_30MINUTE,
     '1H': Client.KLINE_INTERVAL_1HOUR,
     '2H': Client.KLINE_INTERVAL_2HOUR,
     '6H': Client.KLINE_INTERVAL_6HOUR,
