@@ -1,0 +1,186 @@
+swagger: "2.0"
+info:
+  title: Crypto Trading Bot API
+  version: "1.0.0"
+  description: API documentation for the crypto trading bot.
+
+host: 127.0.0.1:5000
+schemes:
+  - http
+  - wss
+basePath: /
+
+paths:
+  /symbols:
+    get:
+      summary: Get available trading symbols
+      produces:
+        - application/json
+      responses:
+        200:
+          description: A list of trading symbols
+          schema:
+            type: object
+            properties:
+              symbols:
+                type: array
+                items:
+                  type: string
+
+  /indicators/custom:
+    post:
+      summary: Fetch custom indicators
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              indicators:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    indicator:
+                      type: string
+                      enum: [rsi, macd, ema, sma]
+                    period:
+                      type: integer
+                    fast_period:
+                      type: integer
+                    slow_period:
+                      type: integer
+                    signal_period:
+                      type: integer
+                example:
+                  - indicator: rsi
+                    period: 14
+                  - indicator: macd
+                    fast_period: 12
+                    slow_period: 26
+                    signal_period: 9
+              symbol:
+                type: string
+                example: BTC/USDT
+              interval:
+                type: string
+                example: 5m
+      responses:
+        200:
+          description: Indicator data and prediction
+          schema:
+            type: object
+            properties:
+              indicators:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    value:
+                      type: number
+                    timestamp:
+                      type: string
+              prediction:
+                type: string
+                example: "up"
+  /candlestick_data_since2023:
+    get:
+      summary: Fetch historical candlestick data since 2023
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Candlestick data saved successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Error fetching data
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+
+  /buy:
+    post:
+      summary: Place a buy order
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              symbol:
+                type: string
+                example: BTCUSDT
+              quantity:
+                type: number
+                example: 0.001
+      responses:
+        200:
+          description: Order details
+          schema:
+            type: object
+            properties:
+              order_id:
+                type: string
+              status:
+                type: string
+        500:
+          description: Error placing buy order
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+
+  /sell:
+    post:
+      summary: Place a sell order
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              symbol:
+                type: string
+                example: BTCUSDT
+              quantity:
+                type: number
+                example: 0.001
+      responses:
+        200:
+          description: Order details
+          schema:
+            type: object
+            properties:
+              order_id:
+                type: string
+              status:
+                type: string
+        500:
+          description: Error placing sell order
+          schema:
+            type: object
+            properties:
+              error:
+                type: string

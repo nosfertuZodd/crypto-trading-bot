@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request
 from binance.client import Client
 from binance.exceptions import BinanceAPIException
 from flask_cors import CORS
+from flasgger import Swagger
 import requests
 import pandas as pd
 import datetime
@@ -14,9 +15,11 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+
 # Initialize Flask app and CORS
 app = Flask(__name__)
 CORS(app)
+swagger = Swagger(app, template_file='swagger.yaml')
 
 
 # Load API keys from environment variables for security
@@ -116,7 +119,7 @@ def make_prediction(indicators):
         return 'Strong Buy'
     elif strong_sell_count >= 2:
         return 'Strong Sell'
-    elif buy_count >= 3:
+    elif buy_count >= 4:
         return 'Buy'
     elif sell_count >= 3:
         return 'Sell'
@@ -156,7 +159,7 @@ def get_custom_indicators():
     # Get the selected indicators from the user's request
     user_indicators = request.json.get('indicators', [])
     symbol = request.json.get('symbol', 'BTC/USDT')
-    interval = request.json.get('interval', '1h')
+    interval = request.json.get('interval', '1m')
     
     if not user_indicators:
         return jsonify({'error': 'Please provide at least one indicator.'}), 400
@@ -236,7 +239,6 @@ def get_indicators():
     interval = request.json.get('interval', '1h')
     responses = []
 
-    # Fetch indicators for the selected symbol and interval
     for indicator_group in indicators:
         for indicator in indicator_group:
             indicator_data = get_indicator_data(symbol, interval, indicator)
@@ -251,13 +253,15 @@ def get_indicators():
 # Endpoint to place a buy order
 @app.route('/buy', methods=['POST'])
 def buy_order():
-    symbol = request.json.get('symbol', 'BTCUSDT')
-    quantity = request.json.get('quantity', 0.001)
-    
-    order = place_order(symbol, quantity, Client.SIDE_BUY)
-    if order:
-        return jsonify(order)
-    return jsonify({'error': 'Failed to place buy order'}), 500
+    try:
+        symbol = request.json.get('symbol', 'BTCUSDT')
+        quantity = request.json.get('quantity', 0.001)
+        order = place_order(symbol, quantity, Client.SIDE_BUY)
+        if order:
+            return jsonify(order), 200
+        return jsonify({'error': 'Failed to place buy order'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Endpoint to place a sell order
 @app.route('/sell', methods=['POST'])
@@ -269,6 +273,7 @@ def sell_order():
     if order:
         return jsonify(order)
     return jsonify({'error': 'Failed to place sell order'}), 500
+
 
 # Endpoint to compare predictions and actual data
 @app.route('/compare_predictions', methods=['POST'])
@@ -284,10 +289,10 @@ def compare_predictions():
     # You can implement prediction logic here. For now, we simulate predicted data:
     predicted_close_prices = [price * 1.01 for price in actual_close_prices]  # Dummy prediction (1% increase)
 
-    # Calculate error metrics
+    # Calculate error metrics 12345
     mae = np.mean(np.abs(np.array(actual_close_prices) - np.array(predicted_close_prices)))
     mse = np.mean((np.array(actual_close_prices) - np.array(predicted_close_prices)) ** 2)
-
+    
     return jsonify({
         'mae': mae,
         'mse': mse,
