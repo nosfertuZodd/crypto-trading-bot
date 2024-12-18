@@ -20,15 +20,15 @@ CORS(app)
 
 
 # Load API keys from environment variables for security
-# API_KEY = os.getenv('API_KEY')
-# API_SECRET = os.getenv('API_SECRET')
-# TAAPI_API_KEY = os.getenv('TAAPI_API_KEY')
+API_KEY = os.getenv('API_KEY')
+API_SECRET = os.getenv('API_SECRET')
+TAAPI_API_KEY = os.getenv('TAAPI_API_KEY')
 
 
 # Load API keys from environment variables for security
-API_KEY = 'R1abV976W7rcTLAAQJpD0NVT9UyWoe6LBCAJj93750Y26Kso1j3lEB6n2rVDuxyo'
-API_SECRET = 'FU00rdJZd0wpxLWbca4AFAVlYmMbkon9Nzddpy2DNe2kkimSazAXvArUnqYyHOuI'
-TAAPI_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjc1MDZkYzI4YTIzODE2NDA3NTVhYjA5IiwiaWF0IjoxNzMzMzI0NDEzLCJleHAiOjMzMjM3Nzg4NDEzfQ.6ZiwhhdexNyeCRvFur0xT1RM1fxPNtQj-46KuiiAtug'
+# API_KEY = 'R1abV976W7rcTLAAQJpD0NVT9UyWoe6LBCAJj93750Y26Kso1j3lEB6n2rVDuxyo'
+# API_SECRET = 'FU00rdJZd0wpxLWbca4AFAVlYmMbkon9Nzddpy2DNe2kkimSazAXvArUnqYyHOuI'
+# TAAPI_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjc1MDZkYzI4YTIzODE2NDA3NTVhYjA5IiwiaWF0IjoxNzMzMzI0NDEzLCJleHAiOjMzMjM3Nzg4NDEzfQ.6ZiwhhdexNyeCRvFur0xT1RM1fxPNtQj-46KuiiAtug'
 
 # Set up logging for better visibility
 logging.basicConfig(level=logging.INFO)
@@ -228,56 +228,6 @@ def get_candlestick_data():
     except Exception as e:
         logging.error(f"Error fetching candlestick data: {str(e)}")
         return jsonify({'error': 'Failed to fetch candlestick data'}), 500
-
- 
-@app.route('/candlestick_data', methods=['GET'])
-def get_candlestick_data_chart():
-    # Get the symbol and interval from query parameters, with defaults
-    symbol = request.args.get('symbol', default='BTCUSDT', type=str)  # Default symbol is BTCUSDT
-    interval = request.args.get('interval', default=Client.KLINE_INTERVAL_5MINUTE, type=str)  # Default interval is 5m
-
-    # Get the current time in UTC
-    end_date = datetime.datetime.utcnow()  # Current UTC time
-    start_date = end_date - datetime.timedelta(hours=10)  # Start date is 10 hours ego from now
-
-    # Format the dates in the required string format for the Binance API
-    start_date_str = start_date.strftime('%Y-%m-%d %H:%M:%S')
-    end_date_str = end_date.strftime('%Y-%m-%d %H:%M:%S')
-
-    all_data = []
-
-    try:
-        # Increase the limit to ensure we get multiple candles for the last 5 minutes
-        limit = 100  # Adjust the limit to fetch more candles (try 10 or more)
-
-        # Fetch candlesticks for the last 5 minutes
-        candlesticks = client.get_historical_klines(
-            symbol=symbol,
-            interval=interval,
-            start_str=start_date_str,
-            end_str=end_date_str,
-            limit=limit  # Fetch 10 candles to cover the last 5 minutes
-        )
-
-        # Prepare the data in a format that React can consume
-        data = [
-            {
-                'dateTime': pd.to_datetime(candle[0], unit='ms').strftime('%Y-%m-%d %H:%M:%S'),
-                'open': float(candle[1]),
-                'high': float(candle[2]),
-                'low': float(candle[3]),
-                'close': float(candle[4]),
-                'volume': float(candle[5]),
-            }
-            for candle in candlesticks
-        ]
-
-        return jsonify(data), 200  # Return the candlestick data as JSON
-
-    except Exception as e:
-        logging.error(f"Error fetching candlestick data: {str(e)}")
-        return jsonify({'error': 'Failed to fetch candlestick data'}), 500
-
 
 # Endpoint to fetch indicator data
 @app.route('/indicators', methods=['POST'])
