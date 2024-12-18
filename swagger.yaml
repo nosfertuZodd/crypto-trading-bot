@@ -44,15 +44,32 @@ paths:
               indicators:
                 type: array
                 items:
-                  type: string
-                  enum: [rsi, macd, ema, sma]
-                example: [rsi, macd]
+                  type: object
+                  properties:
+                    indicator:
+                      type: string
+                      enum: [rsi, macd, ema, sma]
+                    period:
+                      type: integer
+                    fast_period:
+                      type: integer
+                    slow_period:
+                      type: integer
+                    signal_period:
+                      type: integer
+                example:
+                  - indicator: rsi
+                    period: 14
+                  - indicator: macd
+                    fast_period: 12
+                    slow_period: 26
+                    signal_period: 9
               symbol:
                 type: string
                 example: BTC/USDT
               interval:
                 type: string
-                example: 1m
+                example: 5m
       responses:
         200:
           description: Indicator data and prediction
@@ -70,7 +87,7 @@ paths:
                       type: string
               prediction:
                 type: string
-
+                example: "up"
   /candlestick_data_since2023:
     get:
       summary: Fetch historical candlestick data since 2023
