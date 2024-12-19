@@ -10,6 +10,9 @@ import datetime
 import time
 import numpy as np
 from dotenv import load_dotenv
+from config import Config
+from config.db import db
+from config.db.models import User
 
 # Load environment variables
 load_dotenv()
@@ -17,6 +20,14 @@ load_dotenv()
 # Initialize Flask app and CORS
 app = Flask(__name__)
 CORS(app)
+app.config.from_object(Config)
+
+db.init_app(app)
+
+@app.route('/users', methods=['GET'])
+def get_users():
+    users = User.query.all()
+    return jsonify([{'id': user.id, 'username': user.username, 'email': user.email} for user in users])
 
 
 # Load API keys from environment variables for security
@@ -278,6 +289,16 @@ def get_candlestick_data_chart():
         logging.error(f"Error fetching candlestick data: {str(e)}")
         return jsonify({'error': 'Failed to fetch candlestick data'}), 500
 
+from sqlalchemy import text
+
+@app.route('/check_db_connection', methods=['GET'])
+def check_db_connection():
+    try:
+        # Run a simple query to check the connection
+        db.session.execute(text('SELECT 1'))
+        return jsonify({'message': 'Database connection successful'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Endpoint to fetch indicator data
 @app.route('/indicators', methods=['POST'])
@@ -346,4 +367,6 @@ def compare_predictions():
     })
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # Ensure the tables are created
     app.run(debug=True)
