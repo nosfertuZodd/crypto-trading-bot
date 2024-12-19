@@ -1,38 +1,123 @@
-.App {
-  text-align: center;
+/* Default Light Mode */
+body {
+  color: #333;
+  background-color: #eee;
+  padding-left: 7px;
+  padding-top: 3px;
+  --button-size: 24px; /* Default button size */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for light/dark mode */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Dark Mode Styles */
+body.dark-mode {
+  color: #eee;
+  background-color: #4e4e4e;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Symbol select dropdown control */
+.symbol-select .react-select__control {
+  min-width: 150px;
+  max-width: 200px;
+  height: calc(var(--button-size) * 1.2); /* Height based on button size */
+  border-radius: 5px;
+  background-color: #eee; /* Light mode button background */
+  transition: height 0.3s ease, background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Dark mode symbol select dropdown control */
+body.dark-mode .symbol-select .react-select__control {
+  background-color: inherit; /* Matches the page's background color */
+  border-color: #444; /* Dark mode border color */
+}
+
+/* Ensure text color matches the page */
+.symbol-select .react-select__single-value {
+  color: inherit; /* Use the same color as the page text */
+  font-size: 17px;
+  transition: color 0.3s ease; /* Smooth transition for color */
+}
+
+body.dark-mode .symbol-select .react-select__single-value {
+  color: #eee; /* Ensure white text in dark mode */
+}
+
+/* Text inside input field in react-select */
+.symbol-select .react-select__input input {
+  color: inherit; /* Matches the page text color */
+  transition: color 0.3s ease; /* Smooth transition */
+}
+
+body.dark-mode .symbol-select .react-select__input input {
+  color: #eee; /* Ensure white text in dark mode */
+}
+
+/* Symbol select dropdown options */
+.symbol-select .react-select__option {
+  padding: 10px;
+  font-size: calc(var(--button-size) * 0.6); /* Size relative to button */
+  transition: font-size 0.3s ease, background-color 0.3s ease, color 0.3s ease; /* Smooth transition for options */
+}
+
+/* Dark mode select options */
+body.dark-mode .symbol-select .react-select__option {
+  background-color: #333;
+  color: #eee;
+}
+
+/* Styling for the mode toggle buttons */
+.mode-buttons {
+  position: fixed;
+  top: 10px;
+  right: 10px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  gap: 10px;
+  z-index: 1000;
 }
 
-.App-link {
-  color: #61dafb;
+.mode-toggle-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: var(--button-size); /* Use the variable for button size */
+  cursor: pointer;
+  padding: 10px;
+  transition: transform 0.2s ease, font-size 0.3s ease; /* Smooth transition for button size */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.mode-toggle-btn:hover {
+  transform: scale(1.2);
+}
+
+/* Button size changes */
+.mode-toggle-btn.small {
+  --button-size: 18px; /* Small button size */
+}
+
+.mode-toggle-btn.large {
+  --button-size: 32px; /* Large button size */
+}
+
+/* Adjust the size of the symbol list dropdown */
+.symbol-select .react-select__menu {
+  width: auto; 
+  background-color: #eee; /* Light mode menu background */
+  transition: font-size 0.3s ease; /* Smooth transition for font-size */
+}
+
+/* Dark mode background for the dropdown menu */
+body.dark-mode .symbol-select .react-select__menu {
+  background-color: #4e4e4e; /* Matches the dark mode page background */
+  color: #eee;
+}
+
+/* Highlighted option on hover */
+.symbol-select .react-select__option:hover {
+  background-color: #aaa;
+  color: #333;
+}
+
+/* Dark mode hover effect for options */
+body.dark-mode .symbol-select .react-select__option:hover {
+  background-color: #555;
+  color: #eee;
 }

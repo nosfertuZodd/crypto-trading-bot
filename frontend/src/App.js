@@ -1,56 +1,98 @@
-import React, { useState, useEffect } from "react";
-import Select from "react-select";
-import Symbols from "./components/Symbols";
-import PriceCandlestickChart from "./components/charts/PriceCandlestickChart";
+import React, { useState, useEffect } from 'react';
+import Select from 'react-select';
+import './App.css'; // Import CSS file
+import Symbols from './components/Symbols';
+import PriceCandlestickChart from './components/charts/PriceCandlestickChart';
+import ModeButton from './components/ModeButton';
 
 function App() {
-  const [selectedSymbol, setSelectedSymbol] = useState("BTCUSDT"); // Default symbol
-  const [symbolList, setSymbolList] = useState([]); // Initialize as empty array
+  const [selectedSymbol, setSelectedSymbol] = useState('BTCUSDT');
+  const [symbolList, setSymbolList] = useState([]);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Handle symbol list fetch from Symbols component
+  // Fetch symbol list from the Symbols component
   const handleSymbolsFetched = (symbols) => {
-    // Ensure symbols is always an array (if the backend returns JSON, extract symbols)
     if (symbols && symbols.symbols) {
-      setSymbolList(symbols.symbols); // Extract symbols array from the JSON response
+      setSymbolList(symbols.symbols);
     } else {
-      setSymbolList([]); // Fallback to an empty array if no symbols are provided
+      setSymbolList([]);
     }
   };
 
-  // Handle symbol selection from dropdown
+  // Handle symbol selection
   const handleSymbolSelect = (selectedOption) => {
-    setSelectedSymbol(selectedOption.value); // Update selected symbol
+    setSelectedSymbol(selectedOption.value);
   };
 
-  // Transform the symbol list to be in the format React Select expects
-  const options = symbolList.map((symbol) => ({ value: symbol, label: symbol }));
+  // Toggle dark/light mode
+  const toggleMode = () => {
+    setIsDarkMode((prevMode) => {
+      const newMode = !prevMode;
+      localStorage.setItem('darkMode', newMode);
+      return newMode;
+    });
+  };
+
+  // Set dark mode state on initial load
+  useEffect(() => {
+    const storedMode = localStorage.getItem('darkMode');
+    if (storedMode !== null) {
+      setIsDarkMode(storedMode === 'true');
+    }
+  }, []);
+
+  // Update body class based on dark mode
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }, [isDarkMode]);
+
+  // Transform symbol list for react-select options
+  const options = symbolList.map((symbol) => ({
+    value: symbol,
+    label: symbol,
+  }));
 
   return (
     <div className="App">
-      <h1>Welcome to our Crypto App</h1>
+      <h1>Welcome Crypto Trading App</h1>
 
-      {/* Symbols component, passing handleSymbolsFetched as a prop */}
+      {/* Symbols component */}
       <Symbols onSymbolsFetched={handleSymbolsFetched} />
 
-      {/* Ensure symbolList is available before trying to render the dropdown */}
-      {symbolList && symbolList.length > 0 && (
+      {/* Dropdown for symbol selection */}
+      {symbolList.length > 0 ? (
         <div>
           <h2>Select Symbol</h2>
           <Select
-            options={options} // Pass the symbol options to the React Select
+            options={options}
             onChange={handleSymbolSelect}
             value={{ value: selectedSymbol, label: selectedSymbol }}
             placeholder="Search and select a symbol..."
+            className="symbol-select"
+            classNamePrefix="react-select"
+            isSearchable={true} // Ensure search is enabled
           />
         </div>
+      ) : (
+        <p>Loading symbols...</p>
       )}
 
-      {/* Pass the selected symbol as a prop to the chart */}
+      {/* Mode toggle button */}
+      <div className="mode-buttons">
+        <ModeButton isDarkMode={isDarkMode} toggleMode={toggleMode} />
+      </div>
+
+      {/* Chart component */}
       <PriceCandlestickChart
         symbol={selectedSymbol}
         interval="15m"
         startDate="2023-01-01"
         endDate="2023-02-01"
+        isDarkMode={isDarkMode}
       />
     </div>
   );

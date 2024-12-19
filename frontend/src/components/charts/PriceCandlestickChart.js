@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import dayjs from 'dayjs';
 
-const PriceCandlestickChart = ({ symbol, interval, startDate, endDate }) => {
+const PriceCandlestickChart = ({ symbol, interval, startDate, endDate, isDarkMode }) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -40,32 +40,42 @@ const PriceCandlestickChart = ({ symbol, interval, startDate, endDate }) => {
         }))
     }];
 
-    // Chart options configuration
+    // Chart options configuration with conditional dark mode styling
     const options = {
         chart: {
             height: 350,
             type: 'candlestick',  // Specify the type of chart (candlestick)
-        },
-        title: {
-            text: `Candlestick Chart for ${symbol}`,
-            align: 'left',
+            background: isDarkMode ? '##333' : '#eee',  // Change background color based on mode
         },
         xaxis: {
             type: 'datetime',  // Ensure the x-axis is treated as datetime
             labels: {
                 formatter: (val) => dayjs(val).format('MMM DD, HH:mm'),  // Formatting x-axis labels
+                style: {
+                    colors: isDarkMode ? '#fff' : '#000',  // X-axis label color
+                }
             }
         },
         yaxis: {
             tooltip: {
                 enabled: true,  // Tooltip for y-axis to show values
+            },
+            labels: {
+                style: {
+                    colors: isDarkMode ? '#fff' : '#000',  // Y-axis label color
+                }
             }
+        },
+        tooltip: {
+            theme: isDarkMode ? 'dark' : 'light',  // Tooltip theme based on mode
         }
     };
 
     return (
         <div>
-            <h2>{loading ? 'Loading data...' : `Candlestick Chart for ${symbol}`}</h2>
+            <h2 style={{ color: isDarkMode ? '#eee' : '#333' }}>
+                {loading ? 'Loading data...' : `Candlestick Chart for ${symbol}`}
+            </h2>
             <ReactApexChart options={options} series={series} type="candlestick" height={350} />
         </div>
     );
