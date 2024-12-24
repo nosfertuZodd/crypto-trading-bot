@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Select from "react-select";
 import Symbols from "./components/Symbols";
 import PriceCandlestickChart from "./components/charts/PriceCandlestickChart";
@@ -8,14 +8,14 @@ function App() {
   const [symbolList, setSymbolList] = useState([]); // Initialize as empty array
 
   // Handle symbol list fetch from Symbols component
-  const handleSymbolsFetched = (symbols) => {
-    // Ensure symbols is always an array (if the backend returns JSON, extract symbols)
-    if (symbols && symbols.symbols) {
-      setSymbolList(symbols.symbols); // Extract symbols array from the JSON response
-    } else {
-      setSymbolList([]); // Fallback to an empty array if no symbols are provided
-    }
-  };
+  const handleSymbolsFetched = useCallback((symbols) => {
+      // Ensure symbols is always an array (if the backend returns JSON, extract symbols)
+      if (symbols && symbols.symbols) {
+        setSymbolList(symbols.symbols); // Extract symbols array from the JSON response
+      } else {
+        setSymbolList([]); // Fallback to an empty array if no symbols are provided
+      }
+    }, []); 
 
   // Handle symbol selection from dropdown
   const handleSymbolSelect = (selectedOption) => {
