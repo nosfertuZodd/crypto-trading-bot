@@ -31,15 +31,16 @@ def get_users():
 
 
 # Load API keys from environment variables for security
-# API_KEY = os.getenv('API_KEY')
-# API_SECRET = os.getenv('API_SECRET')
-# TAAPI_API_KEY = os.getenv('TAAPI_API_KEY')
+
+API_KEY = os.getenv('API_KEY')
+API_SECRET = os.getenv('API_SECRET')
+TAAPI_API_KEY = os.getenv('TAAPI_API_KEY')
 
 
 # Load API keys from environment variables for security
-API_KEY = 'R1abV976W7rcTLAAQJpD0NVT9UyWoe6LBCAJj93750Y26Kso1j3lEB6n2rVDuxyo'
-API_SECRET = 'FU00rdJZd0wpxLWbca4AFAVlYmMbkon9Nzddpy2DNe2kkimSazAXvArUnqYyHOuI'
-TAAPI_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjc1MDZkYzI4YTIzODE2NDA3NTVhYjA5IiwiaWF0IjoxNzMzMzI0NDEzLCJleHAiOjMzMjM3Nzg4NDEzfQ.6ZiwhhdexNyeCRvFur0xT1RM1fxPNtQj-46KuiiAtug'
+# API_KEY = 'R1abV976W7rcTLAAQJpD0NVT9UyWoe6LBCAJj93750Y26Kso1j3lEB6n2rVDuxyo'
+# API_SECRET = 'FU00rdJZd0wpxLWbca4AFAVlYmMbkon9Nzddpy2DNe2kkimSazAXvArUnqYyHOuI'
+# TAAPI_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjc1MDZkYzI4YTIzODE2NDA3NTVhYjA5IiwiaWF0IjoxNzMzMzI0NDEzLCJleHAiOjMzMjM3Nzg4NDEzfQ.6ZiwhhdexNyeCRvFur0xT1RM1fxPNtQj-46KuiiAtug'
 
 # Set up logging for better visibility
 logging.basicConfig(level=logging.INFO)
@@ -135,6 +136,41 @@ def make_prediction(indicators):
         return 'Hold'  # No clear decision
 
 
+def extract_values(indicators):
+    rsi = None
+    macd = {"valueMACD": None, "valueSignal": None}
+
+    # Iterate over the list of indicators
+    for indicator in indicators:
+        if indicator.get("indicator") == "rsi":
+            rsi = indicator["result"].get("value")
+        elif indicator.get("indicator") == "macd":
+            macd["valueMACD"] = indicator["result"].get("valueMACD")
+            macd["valueSignal"] = indicator["result"].get("valueMACDSignal")
+    
+    return rsi, macd
+
+
+def combine_signals(indicators):
+    # Use extract_values to get RSI and MACD data
+    rsi, macd = extract_values(indicators)
+    
+    # Ensure the extracted values are valid
+    if rsi is None or macd["valueMACD"] is None or macd["valueSignal"] is None:
+        raise ValueError("RSI or MACD values are missing in the result data")
+    
+    # Convert values to integers
+    rsi_value = float(rsi)
+    macd_value = float(macd["valueMACD"])
+    macd_signal = float(macd["valueSignal"])
+    
+    # Determine signals based on RSI and MACD logic
+    if rsi_value < 30 and macd_value > macd_signal:
+        return "BUY"
+    elif rsi_value > 70 and macd_value < macd_signal:
+        return "SELL"
+    else:
+        return "HOLD"
 
 # Helper function to make a buy order
 def place_order(symbol, quantity, side):
@@ -149,6 +185,7 @@ def place_order(symbol, quantity, side):
     except BinanceAPIException as e:
         logging.error(f"Error placing order: {str(e)}")
         return None
+
 
 # Endpoint to fetch available symbols
 @app.route('/symbols', methods=['GET'])
@@ -190,13 +227,13 @@ def get_custom_indicators():
         if response.status_code == 200:
             # Parse the response and extract the indicator values
             indicators = response.json().get('data', {})
-            
-            # Call the decision-making function
             prediction = make_prediction(indicators)
-            
+            signals = combine_signals(indicators)
+
             return jsonify({
                 'indicators': indicators,
-                'prediction': prediction
+                'prediction': prediction,
+                'signals' :signals
             })
         else:
             return jsonify({'error': 'Error from TAAPI.io', 'status_code': response.status_code}), 500
