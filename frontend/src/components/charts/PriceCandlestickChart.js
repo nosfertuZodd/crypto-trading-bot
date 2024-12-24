@@ -7,19 +7,16 @@ const PriceCandlestickChart = ({ symbol, interval, startDate, endDate }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Make sure to handle empty values in props
-        const fetchSymbol = symbol || 'BTCUSDT';  // Default symbol
-        const fetchInterval = interval || '5m';  // Default interval
-        const fetchStartDate = startDate || '2023-01-01';  // Default start date
-        const fetchEndDate = endDate || 'currentDate';  // Default end date
+        const fetchSymbol = symbol || 'BTCUSDT';
+        const fetchInterval = interval || '5m';
+        const fetchStartDate = startDate || '2023-01-01';
+        const fetchEndDate = endDate || 'currentDate';
 
-        // Dynamically fetch candlestick data based on provided props
         fetch(`http://127.0.0.1:5000/candlestick_data?symbol=${fetchSymbol}&interval=${fetchInterval}&start_date=${fetchStartDate}&end_date=${fetchEndDate}`)
             .then(response => response.json())
             .then(result => {
-                console.log("Fetched data:", result); // Log the data to check its structure
                 if (Array.isArray(result) && result.length > 0) {
-                    setData(result);  // Set the fetched data to the state
+                    setData(result);
                 } else {
                     console.error("No valid data returned");
                 }
@@ -29,44 +26,106 @@ const PriceCandlestickChart = ({ symbol, interval, startDate, endDate }) => {
                 console.error("Error fetching candlestick data:", error);
                 setLoading(false);
             });
-    }, [symbol, interval, startDate, endDate]);  // Trigger effect when any of these props change
+    }, [symbol, interval, startDate, endDate]);
 
-    // Format the data for the ApexCharts candlestick chart
-    const series = [{
-        name: 'candlestick',
-        data: data.map(item => ({
-            x: dayjs(item.dateTime).isValid() ? dayjs(item.dateTime).toDate() : new Date(),  // Parse the date properly
-            y: [item.open, item.high, item.low, item.close],  // [open, high, low, close] for the candlestick
-        }))
-    }];
+    const candlestickSeries = [
+        {
+            name: 'Candlestick',
+            type: 'candlestick',
+            data: data.map(item => ({
+                x: dayjs(item.dateTime).isValid() ? dayjs(item.dateTime).toDate() : new Date(),
+                y: [item.open, item.high, item.low, item.close],
+            })),
+        },
+    ];
 
-    // Chart options configuration
-    const options = {
+    const volumeSeries = [
+        {
+            name: 'Volume',
+            type: 'column',
+            data: data.map(item => ({
+                x: dayjs(item.dateTime).isValid() ? dayjs(item.dateTime).toDate() : new Date(),
+                y: item.volume,
+                fillColor: item.open > item.close ? '#FF0000' : '#336d16', // Red if open > close, green otherwise
+            })),
+        },
+    ];
+
+    const candlestickOptions = {
         chart: {
-            height: 350,
-            type: 'candlestick',  // Specify the type of chart (candlestick)
+            height: 300,
+            type: 'candlestick',
         },
         title: {
             text: `Candlestick Chart for ${symbol}`,
             align: 'left',
         },
         xaxis: {
-            type: 'datetime',  // Ensure the x-axis is treated as datetime
-            labels: {
-                formatter: (val) => dayjs(val).format('MMM DD, HH:mm'),  // Formatting x-axis labels
-            }
+            type: 'datetime',
         },
         yaxis: {
+            title: {
+                text: 'Price',
+            },
             tooltip: {
-                enabled: true,  // Tooltip for y-axis to show values
-            }
-        }
+                enabled: true,
+            },
+        },
+        plotOptions: {
+            candlestick: {
+                colors: {
+                    upward: '#336d16',
+                    downward: '#FF0000',
+                },
+            },
+        },
+        tooltip: {
+            shared: true,
+            intersect: false,
+        },
+    };
+
+    const volumeOptions = {
+        chart: {
+            height: 200,
+            type: 'bar',
+        },
+        title: {
+            text: `Volume Chart for ${symbol}`,
+            align: 'left',
+        },
+        xaxis: {
+            type: 'datetime',
+        },
+        yaxis: {
+            title: {
+                text: 'Volume',
+            },
+        },
+        plotOptions: {
+            bar: {
+                columnWidth: '75%',
+            },
+        },
+        dataLabels: {
+            enabled: false,
+        },
+        tooltip: {
+            shared: true,
+            intersect: false,
+        },
+        colors: ['#FF0000', '#336d16'],
     };
 
     return (
         <div>
-            <h2>{loading ? 'Loading data...' : `Candlestick Chart for ${symbol}`}</h2>
-            <ReactApexChart options={options} series={series} type="candlestick" height={350} />
+            <h2>{loading ? 'Loading data...' : `Candlestick and Volume Charts for ${symbol}`}</h2>
+            <div>
+                <ReactApexChart options={candlestickOptions} series={candlestickSeries} type="candlestick" height={300} />
+            </div>
+            <div style={{ marginTop: '20px' }}>
+                <ReactApexChart options={volumeOptions} series={volumeSeries} type="bar" height={300} />
+            </div>
         </div>
     );
 };
